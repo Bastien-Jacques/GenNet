@@ -16,8 +16,20 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 - [Contact](#contact)
 
 ## 🛠 Installation
-
 ### Prerequisites
 - Python 3.9+
 - pip (or conda)
+
+# Clone the repository
+git clone https://github.com/Bastien-Jacques/GenNet.git
+cd GenNet
+
+# Create a virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate   # Linux/Mac
+venv\Scripts\activate      # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
 
