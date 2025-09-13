@@ -1,0 +1,39 @@
+# config.yaml
+
+training:
+  epochs: 300
+  train_batch_size: 8
+  val_batch_size: 4
+  test_batch_size: 8
+  lr: 1e-4 #learning rate initial
+  weight_decay: 1e-5
+  dropout: 0.0         # Dropout
+  lmbda: 1             # Poids de la loss C_d dans la loss totale
+  delta: 0.1           #hyperpatramètre de la loss L1 Clamped
+  lmbda_eikonal: 0.1   # hyperparamtre de la loss Eikonal
+  
+scheduler:
+  factor: 0.2              # divise le LR par 5
+  patience: 10              # attend 8 epochs sans amélioration
+  min_lr: 1e-6 
+
+model:
+  latent_dim: 128    #dimension des vecteurs de l'espace latent
+  hidden_dim: 256       # couche cahée encodeur
+  hidden_dim_sdf: 256   #couche cachée pour le réseau SDF (couches intermédiaires du réseau)
+
+data:
+  train_path: /home/amb/bjacques/GenNet/data_split/train_data.h5
+  val_path: /home/amb/bjacques/GenNet/data_split/val_data.h5
+  test_path: "/home/amb/bjacques/GenNet/data_split/test_data.h5"
+  OOD_path: "/home/amb/bjacques/GenNet/data_split/ModelNet40.h5"
+
+output:
+  best_model_path: /home/amb/bjacques/GenNet/Weights/best_model_optuna_1.pt
+  save_dir: /home/amb/bjacques/GenNet/Optuna_weights
+
+  
+
+
+
+
