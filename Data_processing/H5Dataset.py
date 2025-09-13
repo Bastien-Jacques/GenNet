@@ -2,8 +2,9 @@ import torch
 from torch.utils.data import Dataset
 import h5py
 
+### This code enables the creation of torch tensors using .h5 files ###
 
-### Chargement des données ###
+## data loading ##
 
 class H5SDFDataset(Dataset):
     def __init__(self, h5_path):
