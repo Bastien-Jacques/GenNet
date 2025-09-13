@@ -8,8 +8,12 @@ import yaml
 from tqdm import tqdm
 import trimesh
 
+## This code permits the morphing between two shapes of the test datset (Fastback and notchback)##
+## To do this we generate new latent vectors using: z_new = alpha*z_F + (1 - alpha)*z_N (linear interpolation) and then
+## generate the corresponding shape using the SDF Decoder
+
 # Charger le config.yaml
-with open("/home/amb/bjacques/GenNet/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 # Setup
@@ -28,7 +32,7 @@ model = AutoencoderSDF(128, 256, 0).to(device)
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
 
-# IDs ciblés
+# wanted IDs (for interpolation between Fastback and Notchback car shapes)
 id_Fastback  = 'F_D_WM_WW_3215'
 id_Notchback = 'N_S_WWS_WM_331'
 target_ids = [id_Fastback, id_Notchback]
@@ -36,11 +40,10 @@ target_ids = [id_Fastback, id_Notchback]
 Result = {'shape_id':[],
           'latent':[]}
 
-# Boucle DataLoader
 for batch in tqdm(test_loader, desc="Processing test set"):
     points   = batch['points'].to(device)
     sdf      = batch['sdf'].to(device)
-    shape_id = batch['shape_id']  # reste sur CPU (liste de strings)
+    shape_id = batch['shape_id'] #(stays on CPU)
 
     with torch.no_grad():
         z_batch = model.encoder(points, sdf)
@@ -48,7 +51,7 @@ for batch in tqdm(test_loader, desc="Processing test set"):
     for idx in range(points.shape[0]):
         sid = shape_id[idx]
         if sid not in target_ids:
-            continue  # on saute les échantillons qui ne sont pas ciblés
+            continue
 
         z = z_batch[idx].unsqueeze(0)
         Result['shape_id'].append(sid)
@@ -63,7 +66,7 @@ def reconstruct_and_export(z, alpha):
     grid_x, grid_y, grid_z = np.meshgrid(x, y, z_lin, indexing='ij')
     grid_points = np.stack([grid_x, grid_y, grid_z], axis=-1).reshape(-1, 3)
 
-    batch_points = 128**3  # nombre de points traités par batch
+    batch_points = 128**3  # quantity of points treated per batch
     sdf_pred_list = []
 
     with torch.no_grad():
@@ -80,15 +83,12 @@ def reconstruct_and_export(z, alpha):
     verts, faces, _, _ = marching_cubes(sdf_3d, level=0.0)
     mesh = trimesh.Trimesh(vertices=verts, faces=faces)
 
-    # Nettoyage
-    #components = mesh.split(only_watertight=False)
-    #filtered = [c for c in components if c.area > 1e-4]
-    #if not filtered:
-        #print(f"Aucun composant significatif pour {shape_id}")
-        #return
-    #mesh = max(filtered, key=lambda c: c.area)
+    # Cleaning
+    components = mesh.split(only_watertight=False)
+    filtered = [c for c in components if c.area > 1e-4]
+    mesh = max(filtered, key=lambda c: c.area)
 
-    out_file = f'/home/amb/bjacques/GenNet/Results/mesh_reconstruction/test5_mesh_alpha_{alpha:.1f}.stl'
+    out_file = f'Results/mesh_reconstruction/mesh_alpha_{alpha:.1f}.stl'
     mesh.export(out_file)
     print(f'{out_file} done')
 
