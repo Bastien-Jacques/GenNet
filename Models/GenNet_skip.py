@@ -40,6 +40,9 @@ class SDFDecoder(nn.Module):
         self.fc5 = nn.Linear(hidden_dim, hidden_dim) # fully-connected hidden_dim --> hidden_dim
         self.fc6 = nn.Linear(hidden_dim, hidden_dim)
 
+        self.cd_fc1 = nn.Linear(latent_dim, hidden_dim)
+        self.cd_fc2 = nn.Linear(hidden_dim, hidden_dim)
+
         # Double head
         self.head_sdf = nn.Linear(hidden_dim, 1) # SDF head: hidden_dim --> 1
         self.head_cd = nn.Linear(latent_dim, 1) #Cd head: latent_dim --> 1
