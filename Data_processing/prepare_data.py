@@ -1,6 +1,5 @@
-### Ce code python permet de créer la base de données en récupérant les fichiers Drag et SDF 
-# ainsi que de partitionner ces données en train, validation et test 
-# pour l'entraînement et l'inférence du modèle ###
+## This code enables the creation of the database by taking the Drag and SDF files. 
+# It also makes the partionning of the data into a train set, validation set and test set
 
 import os
 import glob
@@ -19,30 +18,30 @@ import h5py
 
 
 
-## structure des données à charger ##
+## structure of data##
 
 """
 ├────Drag/
 │   ├── Cd_E_S_WW_WM.txt ────────────────────────|
 │   ├── Cd_N_S_WWC_WM.txt                        |
-│   └── ... (autres .txt avec les Cd)            |───────── E_S_WW_WM_001.npz Cd_1
+│   └── ... (folders for each car shape)         |───────── E_S_WW_WM_001.npz Cd_1 each drag coefficient
 │                                                           E_S_WW_WM_002.npz Cd_2
 └───SDF_files/                                                         .
         ├── SDF_E_S_WW_WM_000.npz                                      .
         ├── SDF_E_S_WW_WM_001.npz                                      .
         ├── ...                                             E_S_WW_WM_700.npz Cd_700
         └── SDF_N_S_WWC_WM_680.npz
+        every SDF file (8000 files)
 """
 
-### -- Créattion du Dataset -- ###
+### -- Dataset creation -- ###
 
 
 class SDFDataset(Dataset):
     def __init__(self, sdf_dir, cd_txt_dir):
-        # Tous les .npz directement dans sdf_dir
         self.filepaths = sorted(glob.glob(os.path.join(sdf_dir, "*.npz")))
 
-        # Lecture des fichiers .txt pour récupérer les Cd
+        # Lecture des .txt files to find Cd
         self.cd_dict = {}
         txt_files = sorted(glob.glob(os.path.join(cd_txt_dir, "*.txt")))
         for txt in txt_files:
@@ -55,32 +54,31 @@ class SDFDataset(Dataset):
                             cd = float(parts[1])
                             self.cd_dict[name] = cd
                         except ValueError:
-                            print(f"[WARN] Cd invalide pour {name} dans {txt}")
+                            print(f"[WARN] Cd invalide for {name} in {txt}")
 
         self.valid_filepaths = []
         self.valid_cd_values = []
         self.valid_names = []
 
-        print(f"Association des SDF et Cd ({len(self.filepaths)} fichiers trouvés)...")
+        print(f"Association of SDF and Cd ({len(self.filepaths)} files find)...")
         for path in tqdm(self.filepaths, desc="Matching SDF ↔ Cd"):
             base_name = os.path.splitext(os.path.basename(path))[0]
 
-            # Check correspondance + fichier valide
+            # Check correspondance + valide file
             if base_name in self.cd_dict:
                 try:
                     with np.load(path) as data:
-                        # Vérifie juste qu'on peut lire les clés et accéder à 'points' et 'sdf'
                         _ = data['points']
                         _ = data['sdf']
                     self.valid_filepaths.append(path)
                     self.valid_cd_values.append(self.cd_dict[base_name])
                     self.valid_names.append(base_name)
                 except (zipfile.BadZipFile, KeyError, OSError) as e:
-                    tqdm.write(f"[WARN] Fichier invalide ou corrompu : {path} ({type(e).__name__})")
+                    tqdm.write(f"[WARN] file not valid or corrompted : {path} ({type(e).__name__})")
             else:
-                tqdm.write(f"[WARN] Pas de Cd pour {base_name} → ignoré.")
+                tqdm.write(f"[WARN] No Cd for {base_name} → ignored.")
 
-        assert len(self.valid_filepaths) > 0, "Aucun fichier SDF associé à un Cd valide trouvé."
+        assert len(self.valid_filepaths) > 0, "No SDF file associated to a Cd file was find."
 
     def __len__(self):
         return len(self.valid_filepaths)
@@ -92,7 +90,7 @@ class SDFDataset(Dataset):
                 points = data['points'].astype(np.float32)
                 sdf = data['sdf'].astype(np.float32)
         except Exception as e:
-            raise RuntimeError(f"[ERROR] Impossible de lire {file} dans __getitem__ : {e}")
+            raise RuntimeError(f"[ERROR] Impossible to read {file} in __getitem__ : {e}")
 
         cd = self.valid_cd_values[idx]
         name = self.valid_names[idx]
@@ -105,8 +103,8 @@ class SDFDataset(Dataset):
         }
 
 
-SDF_path = '/home/amb/bjacques/SDF_files'
-Drag_path = '/home/amb/bjacques/Drag'
+SDF_path = 'YOurSDFPath'
+Drag_path = 'YourDragPath'
 full_dataset = SDFDataset(SDF_path, Drag_path)
 total_size = len(full_dataset)
 
@@ -115,30 +113,27 @@ total_size = len(full_dataset)
 train_ratio = 0.8
 val_ratio = 0.1
 
-# Calcul des tailles
+# Calcul des shapes
 train_size = int(train_ratio * total_size)
 val_size = int(val_ratio * total_size)
 test_size = total_size - train_size - val_size  
 
-# Split aléatoire (reproductible si seed fixée)
+# Random Split (reproductible of fixed seed)
 train_dataset, val_dataset, test_dataset = random_split(
     full_dataset, [train_size, val_size, test_size],
     generator=torch.Generator().manual_seed(42)
 )
 
 
-# Normalisation des Cd après le split
-# Calculez Cd_max et Cd_min sur le dataset d'entraînement
+# Normalisation of Cd after splitting the data
+# Calcul of Cd_max and Cd_min on the dataset of training only ## Very important in order to prevent data leakage
 train_cd_values = [item['Cd'].item() for item in train_dataset]
 Cd_max = max(train_cd_values)
 Cd_min = min(train_cd_values)
 
-# le validation set est bien normalisé avec les min et max du train set
-# et non avec les max et min du validation set
-
 def export_subset_to_hdf5(dataset_subset, full_dataset, filename, normalize_cd=False, cd_min=None, cd_max=None):
     N = len(dataset_subset)
-    P = 250000
+    P = 250000 
 
     with h5py.File(filename, 'w') as f:
         points_ds = f.create_dataset('points', shape=(N, P, 3), dtype='float32')
@@ -151,7 +146,7 @@ def export_subset_to_hdf5(dataset_subset, full_dataset, filename, normalize_cd=F
             try:
                 item = full_dataset[idx]
             except Exception as e:
-                print(f"[SKIP] Fichier {full_dataset.valid_filepaths[idx]} → {e}")
+                print(f"[SKIP] File {full_dataset.valid_filepaths[idx]} → {e}")
                 continue
 
             points = item['points'].numpy()
@@ -161,7 +156,7 @@ def export_subset_to_hdf5(dataset_subset, full_dataset, filename, normalize_cd=F
                 cd = (cd - cd_min) / (cd_max - cd_min)
 
             if points.shape != (P, 3) or sdf.shape != (P,):
-                print(f"[SKIP] Forme inattendue pour {item['shape_id']}, shape points = {points.shape}")
+                print(f"[SKIP] not attended shape for {item['shape_id']}, shape points = {points.shape}")
                 continue
 
             points_ds[i] = points
@@ -173,11 +168,11 @@ def export_subset_to_hdf5(dataset_subset, full_dataset, filename, normalize_cd=F
             gc.collect()
 
 
-# Répertoire de sortie
-output_dir = '/home/amb/bjacques/GenNet/data_split'
+#  Output directory
+output_dir = 'YourOtput/dir' #(YourEnvironment/data_split) for instance
 os.makedirs(output_dir, exist_ok=True)
 
-# Sauvegarde des Cd min/max pour la dénormalisation future
+# Save of Cd min and Cd_max for future denormalisation
 cd_stats = {'Cd_min': Cd_min, 'Cd_max': Cd_max}
 with open(os.path.join(output_dir, 'cd_stats.json'), 'w') as f:
     json.dump(cd_stats, f, indent=4)
