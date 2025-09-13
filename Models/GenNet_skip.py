@@ -67,12 +67,15 @@ class SDFDecoder(nn.Module):
         h = F.relu(self.fc5(h))                       
 
         sdf = self.head_sdf(h).squeeze(-1)             # (B, N)
-        cd = self.head_cd(self.dropout_cd(z))
+
+        f = F.relu(self.cd_fc1(z))
+        f = F.relu(self.cd_fc2(f))
+        cd = self.head_cd(self.dropout_cd(f))
         # (B,)
 
         return sdf, cd 
     
-## Auto-encodeur = Encodeur + Décodeur ##
+## Auto-encoder = Encoder + Decoder ##
 
 class AutoencoderSDF(nn.Module):
     def __init__(self, latent_dim, hidden_dim, dropout):
