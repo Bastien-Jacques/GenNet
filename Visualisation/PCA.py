@@ -1,3 +1,5 @@
+### PCA analysis ###
+
 import numpy as np
 import torch
 from sklearn.decomposition import PCA
@@ -5,9 +7,9 @@ import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 import sys
 sys.path.append("/home/amb/bjacques/GenNet")
-from Models.GenNet_v2 import AutoencoderSDF
-from Models.GenNet_v2 import SDFDecoder
-from Models.GenNet_v2 import SDFEncoder
+from Models.GenNet import AutoencoderSDF
+from Models.GenNet import SDFDecoder
+from Models.GenNet import SDFEncoder
 import yaml
 from H5Dataset import H5SDFDataset
 from tqdm import tqdm
@@ -15,17 +17,15 @@ import h5py
 import json
 
 
-with open('/home/amb/bjacques/GenNet/data_split/cd_stats.json', 'r') as f:
+with open('cd_stats.json', 'r') as f:
     cd_stats = json.load(f)
 
 Cd_min = cd_stats['Cd_min']
 Cd_max = cd_stats['Cd_max']
 
-def denormalize(Cd, Cd_max, Cd_min): #dénormalise une valeur Cd
+def denormalize(Cd, Cd_max, Cd_min): 
   return Cd * (Cd_max - Cd_min) + Cd_min
-
-
-# Charger le fichier YAML des Hyperparamètres
+    
 
 with open("/home/amb/bjacques/GenNet/config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -38,7 +38,7 @@ hidden_dim = config['model']['hidden_dim']
 dropout = config['training']['dropout']
 print(dropout)
 
-model_path = "/home/amb/bjacques/GenNet/Weights/best_model_500_v2_dropout_0.pt"
+model_path = "Your_Model_Weights_Path.pt"
 
 model = AutoencoderSDF(latent_dim, hidden_dim, dropout).to(device)
 model.load_state_dict(torch.load(model_path, map_location=device))
@@ -68,7 +68,7 @@ with torch.no_grad():
         latent_vectors.append(z.cpu().numpy())
         cd_values.append(Cd)
 
-# Concatène tous les batchs
+# batchs concatenation
 latent_vectors = np.concatenate(latent_vectors, axis=0)
 cd_values = np.concatenate(cd_values, axis=0)
 
@@ -77,7 +77,7 @@ pca = PCA(n_components=2)
 latent_2d = pca.fit_transform(latent_vectors)
 
 
-with h5py.File("/home/amb/bjacques/GenNet/Results/latent_space.h5", 'w') as f:
+with h5py.File("Your_dep/latent_space.h5", 'w') as f:
     f.create_dataset("latent_2d", data=latent_2d)
     f.create_dataset("latent_vectors", data=latent_vectors)
     f.create_dataset("cd_values", data=cd_values)
