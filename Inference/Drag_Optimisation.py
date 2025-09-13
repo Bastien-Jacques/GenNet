@@ -1,4 +1,4 @@
-from Models.GenNet_skip_v2 import AutoencoderSDF
+from Models.GenNet_skip import AutoencoderSDF
 import numpy as np
 import torch
 from tqdm import tqdm
@@ -11,15 +11,17 @@ from scipy.spatial.distance import cdist
 # Setup
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Chargement du latent train
-train_path = '/home/amb/bjacques/GenNet/Results/latent_train.npz'
-latent_train = np.load(train_path, allow_pickle=True)
+# Use the latent space created by your model. You can easily got it by inferencing the decoder of the model only with train/validation or test data (SDF).
+# Loading latent train
+
+train_path = 'Your_Latent_Train_Path.npz'
+latent_train = np.load(train_path, allow_pickle=True) #contains all latent vectors corresponding to training data
 z_train = latent_train['z']
 Z_train = torch.tensor(z_train, dtype=torch.float32, device=device)  # shape (N, D)
 
 ids = latent_train['shape_id']
 
-# Calcul mu et Sigma
+# Calcul mean and std
 mu_train = np.mean(z_train, axis=0)
 cov_train = np.cov(z_train, rowvar=False)
 eps = 1e-6
@@ -28,7 +30,7 @@ cov_inv = np.linalg.inv(cov_train)
 cov_inv_torch = torch.tensor(cov_inv, dtype=torch.float32, device=device)
 
 
-# Calcul de <d>
+# calcul of <d> (average min distance between vectors of the latent space of train)
 Dmat = cdist(z_train, z_train, metric='mahalanobis', VI=cov_inv)
 np.fill_diagonal(Dmat, np.inf)
 dmins = Dmat.min(axis=1)
@@ -50,14 +52,14 @@ Cd_max = cd_stats['Cd_max']
 def denormalize(Cd, Cd_max, Cd_min):
     return Cd * (Cd_max - Cd_min) + Cd_min
 
-
+#be sure you use the propers hyperparameters
 latent_dim = 128
 hidden_dim = 256
-dropout = 0.05
+dropout = 0.05 #Use the same value as for model training
 
 # Load model
 model = AutoencoderSDF(latent_dim, hidden_dim, dropout)
-model.load_state_dict(torch.load("/home/amb/bjacques/GenNet/Weights/Newmodel_1.pt"))
+model.load_state_dict(torch.load("Your_Model_Weights.pt"))
 model.to(device)
 
 # Enable MC Dropout
@@ -79,16 +81,17 @@ for i in range(N):
         break
 
 if z_init is None:
-    raise ValueError("Aucun latent avec ID commençant par 'F' trouvé.")
+    raise ValueError("No latent vector with 'F' IF found.")
 
 z = torch.tensor(z_init, dtype=torch.float32, requires_grad=True, device=device)
+#Initialisation with fastback car shape
 
 # Optim settings
 lr = 1e-5
 epochs = 1000
-MC = 100
-lambda_reg = 1
-lambda_maha = 0.005
+MC = 100 #Amount of MC dropout calculs (the more the better)
+lambda_reg = 1 #parameter for gradient descent regularization using uncertainty measured by MC dropout
+lambda_maha = 0.005 #parameter for gradient descent regularization using Mahalanobis distance from the center of the training manifold
 optimizer = torch.optim.Adam([z], lr=lr)
 
 Result = {
@@ -105,9 +108,6 @@ Result = {
 for epoch in tqdm(range(epochs)):
     optimizer.zero_grad()
     preds = []
-
-    # Copie CPU numpy de z pour cdist
-    # Mahalanobis distance différentiable
     delta = Z_train - z.unsqueeze(0)  # (N, D)
     dists_squared = torch.einsum('nd,dk,nk->n', delta, cov_inv_torch, delta)  # (N,)
     d_maha = torch.sqrt(dists_squared + 1e-6).min()  # scalaire torch
@@ -115,8 +115,6 @@ for epoch in tqdm(range(epochs)):
 
     Result['dist'].append(d_maha.item())
     Result['maha_reg'].append(maha_reg.detach().cpu().item())
-
-
 
     # MC Dropout
     for _ in range(MC):
@@ -140,7 +138,7 @@ for epoch in tqdm(range(epochs)):
     Result['norm'].append(torch.norm(z).item())
 
 # Save results
-np.savez(f"/home/amb/bjacques/GenNet/Results/Tracking/z_tracking_new_model_distance_lambda_{lambda_maha}.npz",
+np.savez(f"Your_Results_path.npz",
          z_array=np.array(Result['z_history']),
          cd_array=np.array(Result['Cd_pred']),
          norm_array=np.array(Result['norm']),
@@ -150,4 +148,4 @@ np.savez(f"/home/amb/bjacques/GenNet/Results/Tracking/z_tracking_new_model_dista
          distance = np.array(Result['dist']),
          maha_reg = np.array(Result['maha_reg']))
 
-print("Fichier sauvegardé.")
+print("file saved.")
