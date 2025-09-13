@@ -1,3 +1,5 @@
+## Training of the model ##
+
 import os
 import glob
 import numpy as np
@@ -13,29 +15,27 @@ from Models.GenNet_skip_v2 import AutoencoderSDF
 from H5Dataset import H5SDFDataset
 import yaml
 
-# Charger le fichier YAML des Hyperparamètres
 
-with open("/home/amb/bjacques/GenNet/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
-lr = 1e-3
-dropout = 0.05
-lmbda = 0.05
-delta = 0.1
-epochs = 250
+#define hyperparameters
+
+lr = 1e-3 #learning rate
+dropout = 0.05 #dropout
+lmbda = 0.05 #weight of Cd in the loss
+delta = 0.1 #L1 clamped loss 
+epochs = 250 #number of epochs
 
 latent_dim = 128
 hidden_dim = 512
 
-
-
-
 # Initialise W&B
-wandb.login(key = '033fda8a1b7e6d603097e8689d269a7b52814c9a')
-wandb.init(project="GenNet_New", name='Newmodel_3', config={'lr':lr,
+wandb.login(key = 'Your Wandb key')
+wandb.init(project="GenNet", name='Newmodel', config={'lr':lr,
                                      'dropout':dropout,
                                      'delta':delta,
                                      'lambda':lmbda,
@@ -44,10 +44,9 @@ wandb.init(project="GenNet_New", name='Newmodel_3', config={'lr':lr,
                                      'epochs':epochs,
                                      'skip-connection': True,
                                      'hidden_layers_sdf':6,
-                                     'hidden_layers_sc':2,
+                                     'hidden_layers_Cd':2,
                                      'latent_dim':latent_dim,
                                      'hidden_dim':hidden_dim})
-## Création des batchs pour entraînement ##
 
 train_path = config['data']['train_path']
 val_path = config['data']['val_path']
@@ -55,20 +54,18 @@ val_path = config['data']['val_path']
 train_dataset = H5SDFDataset(train_path)
 val_dataset   = H5SDFDataset(val_path)
 
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True,
+train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True,
                           num_workers=8, pin_memory=True)
 
-val_loader   = DataLoader(val_dataset, batch_size=2, shuffle=False,
+val_loader   = DataLoader(val_dataset, batch_size=8, shuffle=False,
                           num_workers=8, pin_memory=True)
 
+##(adapt batch_size to your GPU's VRAM)
 
-### -- Entraînement du modèle -- ###
+### -- Training -- ###
 
-model = AutoencoderSDF(latent_dim, hidden_dim, dropout).to(device) #définition du modèle
+model = AutoencoderSDF(latent_dim, hidden_dim, dropout).to(device) #model definition
 optimizer = torch.optim.Adam(model.parameters(), lr=lr) #optimizer  = Adam
-
-#scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=wandb.config.step_size, gamma=wandb.config.gamma)
-#lr scheduler réduit toutes les patience épochs sans prendre en compte l'évolutio de la val loss
 
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
     optimizer, 
@@ -81,24 +78,18 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
     min_lr=1e-6, 
     eps=1e-08)
 
+best_val_loss = float('inf') #initialisation of val_loss (=infinity at first)
 
-#création d'un scheduler pour affiner lr, configuré avec wandb
+best_model_path = "Path_to_save_your_model.pt"
 
-best_val_loss = float('inf') #initialisation de la meilleure val_loss = infinie au début
-
-best_model_path = "/home/amb/bjacques/GenNet/Weights/Newmodel_3.pt"
-#path de sauvegarde du meilleur modèle (selon la val loss) dans le dossier Weights
-
-## définition de la L1 clamped Loss ##
+## L1 clamped Loss ##
 
 def clamped_l1_loss(pred, target, delta):
     pred_clamped = torch.clamp(pred, min=-delta, max=delta)
     target_clamped = torch.clamp(target, min=-delta, max=delta)
     return torch.abs(pred_clamped - target_clamped).mean()
 
-
 ## Training ##
-
 
 for epoch in range(1, epochs + 1):
 
@@ -116,16 +107,13 @@ for epoch in range(1, epochs + 1):
 
           sdf_pred, cd_pred, _ = model(points, sdf)
 
-          loss_sdf = clamped_l1_loss(sdf_pred, sdf, delta) #loss L1 clamped entre sdf_pred et sdf (vérité terrain)
-          #loss_sdf = F.mse_loss(sdf_pred, sdf) #loss MSE entre sdf_pred et sdf (vérité terrain)
-
-          #rajouter loss eikonal dans la suite
+          loss_sdf = clamped_l1_loss(sdf_pred, sdf, delta) #loss L1 clamped between sdf_pred and sdf (GT)
 
           loss_cd = F.mse_loss(cd_pred.squeeze(-1), Cd) #loss MSE entre Cd_pred et Cd (vérité terrain)
-          loss = loss_sdf + lmbda * loss_cd #lambda à paramétrer
+          loss = loss_sdf + lmbda * loss_cd 
 
-        # descente de gradient
-
+        # gradient descent
+            
           optimizer.zero_grad()
           loss.backward()
           optimizer.step()
@@ -143,7 +131,7 @@ for epoch in range(1, epochs + 1):
     train_loss_cd  /= num_batches
     train_total_loss = train_loss_sdf + lmbda * train_loss_cd
 
-    ## Validation ## (pas de backpropagation)
+    ## Validation ## (no backpropagation)
 
     model.eval()
     val_loss_sdf = 0.0
@@ -172,16 +160,10 @@ for epoch in range(1, epochs + 1):
     if val_total_loss < best_val_loss:
       best_val_loss = val_total_loss
       torch.save(model.state_dict(), best_model_path)
-      print(f"Nouveau meilleur modèle sauvegardé val_total_loss = {val_total_loss:.4f}, val_loss_cd = {val_loss_cd}, val_loss_sdf = {val_loss_sdf}")
-
-      # Crée un artifact pour stocker ce modèle dans wandb
-      artifact = wandb.Artifact("best_model", type="model")
-      artifact.add_file(best_model_path)
-      wandb.log_artifact(artifact)
+      print(f"New best modl saved: val_total_loss = {val_total_loss:.4f}, val_loss_cd = {val_loss_cd}, val_loss_sdf = {val_loss_sdf}")
 
     val_total_plot = val_loss_sdf + val_loss_cd
-    # pas de lambda pour pouvoir comparer entre eux les différents entrainements avec des lambda différents
-
+    
     wandb.log({
     "epoch": epoch,
     "train_loss_sdf": train_loss_sdf,
@@ -193,7 +175,7 @@ for epoch in range(1, epochs + 1):
     "learning_rate": optimizer.param_groups[0]['lr']
     })
 
-    scheduler.step(val_total_loss) #pour affiner ou non lr si stagnation de la val loss
+    scheduler.step(val_total_loss) 
     for param_group in optimizer.param_groups:
       print(f"Current LR: {param_group['lr']}")
 
