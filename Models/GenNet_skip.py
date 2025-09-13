@@ -4,9 +4,9 @@ from torch.utils.data import Dataset
 import torch.nn as nn
 import torch.nn.functional as F
 
-### -- Modèle -- ###
+### -- Model -- ###
 
-## Encodeur ##
+## Encoder ##
 
 class SDFEncoder(nn.Module):
     def __init__(self, latent_dim, hidden_dim):
@@ -26,32 +26,30 @@ class SDFEncoder(nn.Module):
         h = F.relu(self.fc2(h))
         z = self.fc3(h)               # (B, N, latent_dim)
         z = z.mean(dim=1)             # Pooling → (B, latent_dim)
-        return z #retourne un vecteur latent de dimension latent_dim
+        return z (,latent_dim)
     
-## Décodeur ##
+## Decoder ##
 
 class SDFDecoder(nn.Module):
     def __init__(self, latent_dim, hidden_dim, dropout):
         super().__init__()
-        self.fc1 = nn.Linear(latent_dim + 3, hidden_dim) #première couche fully connected letent_dim + 3 --> hidden_dim
-        self.fc2 = nn.Linear(hidden_dim, hidden_dim) # couche fully-connected hidden_dim --> hidden_dim
+        self.fc1 = nn.Linear(latent_dim + 3, hidden_dim) #first fully connected letent_dim + 3 --> hidden_dim
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim) # fully-connected hidden_dim --> hidden_dim
         self.fc3 = nn.Linear(hidden_dim, hidden_dim)
-        self.fc4 = nn.Linear(hidden_dim + latent_dim + 3, hidden_dim) # skip connection: on réinjecte le tatent + vecteur position
-        self.fc5 = nn.Linear(hidden_dim, hidden_dim) # couche fully-connected hidden_dim --> hidden_dim
+        self.fc4 = nn.Linear(hidden_dim + latent_dim + 3, hidden_dim) # skip connection
+        self.fc5 = nn.Linear(hidden_dim, hidden_dim) # fully-connected hidden_dim --> hidden_dim
         self.fc6 = nn.Linear(hidden_dim, hidden_dim)
 
-        # Double tête
-        self.head_sdf = nn.Linear(hidden_dim, 1) # tête de sortie SDF: hidden_dim --> 1
-        self.head_cd = nn.Linear(latent_dim, 1) #tête de sortie Cd
-        # Pas besoin des points pour Cd juste vecteur latent qui encode la géométrie + physique
-
+        # Double head
+        self.head_sdf = nn.Linear(hidden_dim, 1) # SDF head: hidden_dim --> 1
+        self.head_cd = nn.Linear(latent_dim, 1) #Cd head: latent_dim --> 1
         self.dropout_cd = nn.Dropout(dropout)
 
     def forward(self, x, z): #x = batch de points 3D, z: batch de vecteurs latents
         # x: (batch_dim, N, 3) — N points 3D
         # z: (batch_dim, latent_dim)
 
-        B, N, _ = x.shape # B = batch_dim, N = N_points_échantillonnage
+        B, N, _ = x.shape # B = batch_dim, N = amount of points of SDF
 
         z_expanded = z.unsqueeze(1).expand(-1, N, -1)  # (B, N, latent_dim)
         input = torch.cat([x, z_expanded], dim=-1)     # (B, N, latent+3)
@@ -60,18 +58,16 @@ class SDFDecoder(nn.Module):
         h = F.relu(self.fc2(h))       
         h = F.relu(self.fc3(h)) 
 
-        h = torch.cat([h, input], dim=-1) # concaténation de la sortie h avec le latent + le vecteur position
+        h = torch.cat([h, input], dim=-1) # concatenation between h and latent + position vector
 
         h = F.relu(self.fc4(h))
         h = F.relu(self.fc5(h))                       
 
-        sdf = self.head_sdf(h).squeeze(-1)             # (B, N) calcul de la sortie géométrique
-        
+        sdf = self.head_sdf(h).squeeze(-1)             # (B, N)
         cd = self.head_cd(self.dropout_cd(z))
-        # (B,) calcul de la sortie physique (coefficient de traînée)
+        # (B,)
 
-        return sdf, cd # sdf est une valeur pour chaque point de chaque sample du batch
-                       # cd est une valeur scalaire pour chaque sample du batch
+        return sdf, cd 
     
 ## Auto-encodeur = Encodeur + Décodeur ##
 
