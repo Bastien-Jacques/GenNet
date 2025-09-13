@@ -1,7 +1,9 @@
+## Visualisation ##
+
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
-from Models.GenNet_skip_v2 import AutoencoderSDF 
+from Models.GenNet_skip import AutoencoderSDF 
 from H5Dataset import H5SDFDataset
 from skimage.measure import marching_cubes
 import yaml
@@ -9,19 +11,18 @@ from tqdm import tqdm
 import trimesh
 
 # Charger le config.yaml
-with open("/home/amb/bjacques/GenNet/config.yaml", "r") as f:
+with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 # Setup
 device = torch.device("cpu")
 
-val_path  = '/home/amb/bjacques/GenNet/data_split/val_data.h5'
-model_path = "/home/amb/bjacques/GenNet/Weights/Newmodel_1.pt"
+val_path  = 'Your_dep/val_data.h5'
+model_path = "Your_Model_Weights_Path.pt"
 
-# Dataset et DataLoader
+# Dataset
 test_dataset = H5SDFDataset(val_path)
 
-# Charger le modèle
 model = AutoencoderSDF(128, 256, 0.05).to(device)
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
@@ -53,7 +54,7 @@ def reconstruct_and_export(z, shape_id):
     grid_x, grid_y, grid_z = np.meshgrid(x, y, z_lin, indexing='ij')
     grid_points = np.stack([grid_x, grid_y, grid_z], axis=-1).reshape(-1, 3)
 
-    batch_points = 128**3  # nombre de points traités par batch
+    batch_points = 128**3 
     sdf_pred_list = []
 
     with torch.no_grad():
@@ -75,8 +76,12 @@ def reconstruct_and_export(z, shape_id):
     filtered = [c for c in components if c.area > 1e-4]
     mesh = max(filtered, key=lambda c: c.area)
 
-    out_file = f'/home/amb/bjacques/GenNet/Results/mesh_reconstruction/newmodel_1_{shape_id}.stl'
+    out_file = f'Shape_visuakisation_{shape_id}.stl'
     mesh.export(out_file)
     print(f'{out_file} done')
 
 reconstruct_and_export(z, shape_id)
+
+## In this code, we make the visualisation of car shaped of the validation set. 
+# You can modify the code easily to generate the visualisation of new shapes using their latent vectors or directly SDF
+
