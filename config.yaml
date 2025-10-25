@@ -27,6 +27,8 @@ data:
   test_path: "/data_split/test_data.h5"
   OOD_path: "/data_split/ModelNet40.h5"
 
+output:
+  model_path: "/Weights/model/pt"
 
 
 
