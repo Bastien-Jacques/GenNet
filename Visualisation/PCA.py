@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 import sys
-sys.path.append("/home/amb/bjacques/GenNet")
+sys.path.append("/GenNet")
 from Models.GenNet import AutoencoderSDF
 from Models.GenNet import SDFDecoder
 from Models.GenNet import SDFEncoder
@@ -27,7 +27,7 @@ def denormalize(Cd, Cd_max, Cd_min):
   return Cd * (Cd_max - Cd_min) + Cd_min
     
 
-with open("/home/amb/bjacques/GenNet/config.yaml", "r") as f:
+with open("/GenNet/config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -38,7 +38,7 @@ hidden_dim = config['model']['hidden_dim']
 dropout = config['training']['dropout']
 print(dropout)
 
-model_path = "Your_Model_Weights_Path.pt"
+model_path = "/GenNet/Models/model.pt"
 
 model = AutoencoderSDF(latent_dim, hidden_dim, dropout).to(device)
 model.load_state_dict(torch.load(model_path, map_location=device))
@@ -50,7 +50,7 @@ ids = []
 train_path = config['data']['train_path']
 batch_size = config['training']['train_batch_size']
 
-# Charger dataset et dataloader
+# Load Dataset and Dataloader
 train_dataset = H5SDFDataset(train_path)
 train_loader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
 
