@@ -80,7 +80,7 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
 
 best_val_loss = float('inf') #initialisation of val_loss (=infinity at first)
 
-best_model_path = config['output']['model']
+best_model_path = config['output']['model_path']
 
 ## L1 clamped Loss ##
 
