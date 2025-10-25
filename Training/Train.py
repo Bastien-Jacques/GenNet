@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import wandb
 import sys
-sys.path.append("/home/amb/bjacques/GenNet")
+sys.path.append("/GenNet")
 from Models.GenNet_skip_v2 import AutoencoderSDF 
 from H5Dataset import H5SDFDataset
 import yaml
