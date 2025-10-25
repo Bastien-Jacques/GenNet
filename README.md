@@ -114,6 +114,35 @@ GenNet/
 ## 📊 Results
 GenNet achieves accurate prediction of aerodynamic drag coefficients and high-fidelity reconstruction of 3D geometries on the **DrivAerNet++** dataset.
 
+### Data representation
+GenNet is based on a signed distance function's representation of each car sample in the **DrivAerNet++** dataset. Signed Distance Function (SDF) is defined as the function:
+
+$$
+\text{SDF}(\mathbf{x}) =
+\begin{cases}
++d(\mathbf{x}, \partial \Omega), & \text{if } \mathbf{x} \notin \Omega \\
+-d(\mathbf{x}, \partial \Omega), & \text{if } \mathbf{x} \in \Omega
+\end{cases}
+$$
+
+where $d(\mathbf{x}, \partial \Omega) = \min_{\mathbf{p} \in \partial \Omega} \| \mathbf{x} - \mathbf{p} \|_2$ is the Euclidean distance from a point $\mathbf{x}$ to the surface boundary $\partial \Omega$.
+
+The geometries of the different vehicles in the DrivAerNet++ dataset are originally provided as meshes. The conversion to SDF format was performed by sampling 250,000 points per vehicle within the cube [-1,1]³, after normalization and centering of the meshes.
+The isotropic normalization ensures that the model learns patterns related to the shape of the vehicles rather than their absolute size.
+
+To avoid excessive computational cost while maintaining a faithful representation of each vehicle’s structure, 80% of the 250,000 points were sampled close to the surface by adding Gaussian noise (standard deviation 0.01, zero mean) relative to the surface.
+The remaining 20% of the points were sampled randomly within the cube.
+
+<p align="center">
+  <img src="docs/échantillonnage-SDF_250k_pts.JPG" alt="250k sampling points" width="600">
+</p>
+The red points correspond to locations outside the mesh (SDF > 0), while the blue points are inside the mesh (SDF < 0).
+<p align="center">
+  <img src="docs/SDF_250k_epsilon.pdf" alt="Distribution of sampling points as a function of the distance to the mesh" width="600">
+</p>
+
+
+
 
 
 
