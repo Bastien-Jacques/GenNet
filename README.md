@@ -134,12 +134,18 @@ To avoid excessive computational cost while maintaining a faithful representatio
 The remaining 20% of the points were sampled randomly within the cube.
 
 <p align="center">
-  <img src="docs/échantillonnage-SDF_250k_pts.JPG" alt="250k sampling points" width="600">
+  <img src="docs/échantillonnage-SDF_250k_pts.JPG" alt="250k sampling points" width="500">
 </p>
 The red points correspond to locations outside the mesh (SDF > 0), while the blue points are inside the mesh (SDF < 0).
 <p align="center">
-  <img src="docs/SDF_250k_epsilon.pdf" alt="Distribution of sampling points as a function of the distance to the mesh" width="600">
+  <img src="docs/SDF_250k_epsilon.jpg" alt="Distribution of sampling points as a function of the distance to the mesh" width="300">
 </p>
+The geometry of a vehicle is thus fully represented implicitly through the 0-isosurface of the Signed Distance Function.
+
+
+
+
+
 
 
 
