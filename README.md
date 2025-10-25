@@ -42,9 +42,16 @@ pip install -r requirements.txt
 ## 🚀 Usage
 
 ### Train the Model
-Train GenNet using the configuration file in ```bash
-configs/:
+To train GenNet on the DrivAerNet++ dataset using the provided configuration file:
+```python
+train.py --config config.yaml
 ```
+This will start the training process and save model checkpoints in the checkpoints/ directory.
+
+
+
+
+
 
 
 
