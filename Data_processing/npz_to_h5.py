@@ -53,7 +53,7 @@ def merge_npz_to_h5(npz_dir, h5_output_path):
     print(f"[OK] Fusion terminée. {N} entrées sauvegardées dans {h5_output_path}")
 
 # === Utilisation ===
-npz_folder = '/home/amb/bjacques/GenNet/SDF_ModelNet40'
-output_h5  = '/home/amb/bjacques/GenNet/data_split/ModelNet40.h5'
+npz_folder = '/GenNet/SDF_ModelNet40'
+output_h5  = '/GenNet/data_split/ModelNet40.h5'
 
 merge_npz_to_h5(npz_folder, output_h5)
