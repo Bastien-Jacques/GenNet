@@ -169,7 +169,7 @@ def export_subset_to_hdf5(dataset_subset, full_dataset, filename, normalize_cd=F
 
 
 #  Output directory
-output_dir = 'YourOtput/dir' #(YourEnvironment/data_split) for instance
+output_dir = '/GenNet/data_split' # for instance
 os.makedirs(output_dir, exist_ok=True)
 
 # Save of Cd min and Cd_max for future denormalisation
