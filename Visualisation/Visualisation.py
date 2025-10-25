@@ -17,8 +17,8 @@ with open("config.yaml", "r") as f:
 # Setup
 device = torch.device("cpu")
 
-val_path  = 'Your_dep/val_data.h5'
-model_path = "Your_Model_Weights_Path.pt"
+val_path  = '/GenNet/data_split/val_data.h5'
+model_path = "/GenNet/Models/model.pt"
 
 # Dataset
 test_dataset = H5SDFDataset(val_path)
@@ -35,7 +35,7 @@ example = next(iter(test_loader))
 points = example['points'].to(device)  # (B, N, 3)
 sdf = example['sdf'].to(device)        # (B, N)
 shape_ids = example['shape_id']
-# === Encode latent ===
+# === latent encoding ===
 model.eval()
 with torch.no_grad():
     z_batch = model.encoder(points, sdf) #(B,z_dim,1)
@@ -71,7 +71,7 @@ def reconstruct_and_export(z, shape_id):
     verts, faces, _, _ = marching_cubes(sdf_3d, level=0.0)
     mesh = trimesh.Trimesh(vertices=verts, faces=faces)
 
-    # Nettoyage
+    # Cleaning
     components = mesh.split(only_watertight=False)
     filtered = [c for c in components if c.area > 1e-4]
     mesh = max(filtered, key=lambda c: c.area)
