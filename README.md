@@ -321,21 +321,53 @@ We also computed the Mean Relative Absolute Error (MRAE) on the test set, as wel
   <b>Left:</b> Barre plot of the Relative Mean Absolute Error (RMAE) between predictions ($\hat{C_d}$) and ground truth ($C_d)$.  <b>Right:</b> Pearson correlation between predictions ($\hat{C_d}$) and ground truth ($C_d)$ .
 </p>
 
-The SDF reconstruction performance was evaluated using the Chamfer Distance, defined as:
+The SDF reconstruction performance was evaluated using the Chamfer Distance (CD), defined as:
 
 $$
 d_{\text{Chamfer}}(S_1, S_2) =\frac{1}{|S_1|} \sum_{x \in S_1} \min_{y \in S_2} \|x - y\|_2^2 + \frac{1}{|S_2|} \sum_{y \in S_2} \min_{x \in S_1} \|x - y\|_2^2
 $$
 
-where $S_1$ and $S_2$ represent the sets of points from the predicted and ground truth surfaces, respectively.
+where $S_1$ and $S_2$ represent the sets of points from the predicted and ground truth surfaces, respectively. The smaller this distance is, the more accurate the reconstruction obtained from the 0-isosurface of a given base shape.
 
 <p align="center">
-  <img src="docs/tableau_SDF.png" width="70%">
+  <img src="docs/tableau_SDF.png" width="55%">
+</p>
+
+
+<p align="center">
+  <b>Up:</b> Performances comparison concernig the SDF reconstruction for several models.  <b>Right:</b> Chamfer distance for the test set. Comparison between the differents car shapes in the dataset (Notchback, Fastback, Estateback).
 </p>
 
 <p align="center">
-  Performances comparison concernig the SDF reconstruction for several models. 
+  <img src="docs/Chamfer_barre_plot_test5_page-0001.jpg" width="45%">
 </p>
+
+<p align="center">
+<b>Down:</b> Chamfer distance for the test set. Comparison between the differents car shapes in the dataset (Notchback, Fastback, Estateback).
+</p>
+
+As expected, our model is less performant than models dedicated exclusively to geometric reconstruction. Nevertheless, GenNet enables the faithful reconstruction of shapes that were never seen during training.
+Furthermore, a simple and visual way to assess the shape generation performance of our model is to perform morphing between different shapes. Below, we show a linear morphing performed between an estateback shape ($\alpha = 0$) and a fastback shape ($\alpha = 1$). All intermediate shapes corresponding to $\alpha \in [0.1,0.9]$ are generated as linear combinations of the two initial latent vectors, according to:
+
+$$
+z = \alpha.z_{\text{fastback}} + (1-\alpha).z_{\text{estateback}}
+$$
+
+The generated shapes exhibit high quality and smooth transitions, demonstrating the model’s ability to generate new, plausible, and geometrically consistent shapes.
+
+<p align="center">
+  <img src="docs/interpolation latent.JPG" width="60%">
+</p>
+
+<p align="center">
+Morphing between fastback and estateback shapes.
+</p>
+
+
+
+
+
+
 
   
 
