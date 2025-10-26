@@ -284,6 +284,17 @@ where each weighting coefficient $\lambda$ controls the contribution of the corr
   <b>Left:</b> $C_d$ Loss for 250 epochs for two different models with skip connections (S1 = GenNet_skip, S1' = GenNet_skip_v2)  <b>Right:</b> SDF loss for two different models
 </p>
 
+<p align="center">
+  <img src="docs/grad_norm_page-0001.jpg" width="45%">
+</p>
+
+<p align="center">
+  SDF gradient norm convergence on 250 epochs
+</p>
+
+
+
+
 
 
 
