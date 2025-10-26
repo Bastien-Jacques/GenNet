@@ -363,12 +363,32 @@ The generated shapes exhibit high quality and smooth transitions, demonstrating 
 Morphing between fastback and estateback shapes.
 </p>
 
+### Uncertainty prediction
+
+To assess the reliability of the model’s predictions, we implemented an uncertainty estimation method for the drag coefficient predictions.
+This uncertainty helps distinguish between high-confidence regions and areas where the model is less certain.
+We only considered epistemic uncertainty, stemming from limited knowledge or model generalization capacity.
+
+To estimate the prediction uncertainty, we employed Monte Carlo (MC) Dropout.
+This technique generates multiple predictions by keeping dropout active during inference, with the same rate as used during training.
+In our case, a dropout rate of $p = 0.05$ was applied only to the layers of the physical decoder.
+This means that each neuron has a probability $p = 0.05$ of being dropped (i.e., temporarily deactivated) both during training and inference, thereby introducing stochasticity in the output and allowing uncertainty estimation.
+
+<p align="center">
+  <img src="docs/interpolation latent.JPG" width="60%">
+</p>
+
+<p align="center">
+Morphing between fastback and estateback shapes.
+</p>
+
 ### Optimisation in latent space.
 
 To generate new car geometries optimized for aerodynamic performance, we employed two different methods.
 The first consists in injecting white noise into the latent vectors corresponding to the car samples from the DrivAerNet++ dataset.
 However, injecting uniform white noise across all latent components leads to poor results, since each component exhibits different variance within the dataset’s latent space.
 Therefore, we inject noise with variance proportional to that of each component, as estimated by Principal Component Analysis (PCA).
+
 
 
 
