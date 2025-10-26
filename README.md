@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 
-GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the DrivAerNet++ Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Mémoire.pdf), where all details concerning the mechanics part and the data processing are given.
+GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the [DrivAerNet++](https://arxiv.org/pdf/2406.09624) Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Mémoire.pdf), where all details concerning the mechanics part and the data processing are given.
 
 ## 📋 Table of Contents
 - [Installation](#-installation)
@@ -246,6 +246,46 @@ x, & \text{if } |x| < \delta \\
 $$
 
 This geometric Loss function as well as the SDF representation of the shapes are inspired by [Park et al. (2019)](https://arxiv.org/pdf/1901.05103).
+
+Finally, it is also possible to define a regularization loss on the Signed Distance Function (SDF), known as the Eikonal loss.
+Indeed, the SDF satisfies the property:
+
+$$
+||\nabla \text{SDF}|| = 1
+$$
+
+Thus, the regularization loss is defined as the residual of this property:
+
+$$
+L_{\text{Eikonal}} = \sum_{i=1}^{n}(||\nabla \text{SDF}|| - 1)^2
+$$
+
+This loss can be used by running the training script
+```bash
+Training/Train_Eikonal.py.
+```
+
+For computational efficiency, the SDF gradient is not computed on all 250k sampled points, but only on 25k randomly selected points at each iteration.
+
+Thus, the total cost function used is:
+
+$$
+L_{\text{total}} = L_{SDF} + \lambda  L_{C_d} + \lambda_E L_{\text{Eikonal}}
+$$
+
+where each weighting coefficient $\lambda$ controls the contribution of the corresponding loss term.
+
+<p align="center">
+  <img src="docs/loss_Cd (1)." width="45%">
+  <img src="docs/decodeur_SDF_skip.JPG" width="45%">
+</p>
+
+<p align="center">
+  <b>Left:</b> Geometric decoder without skip-connections  <b>Right:</b> Geometric decoder with skip-connections
+</p>
+
+
+
 
 
 
