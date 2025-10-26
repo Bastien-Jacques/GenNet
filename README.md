@@ -217,16 +217,35 @@ $$
 which give the negative log likelihood:
 
 $$
-NLL(\theta) =  -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}
+NLL(\theta) =  \frac{n}{2}\log(2\pi\sigma^2) + \frac{1}{2\sigma^2}
 \sum_{i=1}^{n}(x_i - \mu)^2
 $$
 
 Maximizing the likelihood is therefore equivalent to minimizing the Negative Log-Likelihood (NLL).
-In the case of a homoscedastic optimization, this reduces to minimizing the squared error, leading to the following loss function:
+In the case of a homoscedastic optimization ($\sigma = 1$), this reduces to minimizing the squared error, leading to the following loss function:
 
- $$
- L = \sum_{i=1}^{n}(\hat{C_d} - C_d)^2
- $$
+$$
+L = \frac{1}{2}\sum_{i=1}^{n}(\hat{C_d} - C_d)^2
+$$
+
+
+The cost function used for the reconstruction of the Signed Distance Function (SDF) is the clamped L1 loss.
+
+$$
+L = \sum_{i=1}^{n}|\text{clamp}(SDF,\delta) - \text{clamp}(\hat{SDF},\delta)|
+$$
+
+where the clamping function is defined as:
+
+$$
+\text{clamp}(x, \delta) =
+\begin{cases}
+x, & \text{if } |x| < \delta \\
+0, & \text{otherwise}
+\end{cases}
+$$
+
+This geometric Loss function as well as the SDF representation of the shapes are inspired by [Park et al. (2019)](https://arxiv.org/pdf/1901.05103).
 
 
 
