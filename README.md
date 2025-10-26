@@ -152,6 +152,21 @@ This normalization helps stabilize the training process by ensuring proper gradi
 Two different models were created — one with skip connections in the SDF decoder and one without.
 The encoder maps the geometry of each vehicle into a latent vector z of dimension 128.
 The physical decoder predicts the drag coefficient (C<sub>d</sub>) from this latent vector, while the SDF decoder reconstructs the Signed Distance Function, assigning an SDF value to any point in [-1, 1]³ for a given latent vector.
+
+The encoder is defined as:
+
+$$f_\theta(x, \text{SDF}(x)) = z$$
+
+
+The physical decoder acts as:
+
+$$g_\theta^{\phi}(z) = \hat{C_d} \approx C_d$$
+
+
+The SDF decoder acts as:
+
+$$g_\theta^{\text{SDF}}(z, x) = \hat{\text{SDF}}(x) \approx \text{SDF}(x)$$
+
 The architecture of the dual-head autoencoder is shown below.
 
 <p align="center">
@@ -180,8 +195,38 @@ Finally, the SDF decoder is made up of six layers, each with hidden dimensions o
 Skip connections make it possible to transmit information from the latent vector during the forward pass and help mitigate the vanishing gradient problem during backpropagation — an issue that can occur when training deep neural networks.
 The tests conducted in this work demonstrated the importance of skip connections, as the model equipped with them achieved significantly better performance compared to the model without skip connections.
 
+### ⚙️ Training 
 
+During training, we seek the optimal set of parameters 
+$\theta^* = \arg\max_\theta \mathcal{L}(\theta)$
+that maximizes the likelihood, defined as:
 
+$$\mathcal{L}(\theta) = \prod_{i=1}^{n} P(y_i \mid f_{\theta}, D)$$
+
+Where $y_i$ refers to an observation from the ground truth values, $f_{\theta}$ the function defined by the model and the weights $\theta$, D to the training data.
+
+In the case of a Gaussian error assumption for the prediction of the drag coefficient, the likelihood associated with the physical prediction is therefore:
+
+$$
+\mathcal{L}(\theta)
+= \prod_{i=1}^{n}
+\frac{1}{\sqrt{2\pi\sigma^2}}
+\exp\left(-\frac{(x_i - \mu)^2}{2\sigma^2}\right)
+$$
+
+which give the negative log likelihood:
+
+$$
+NLL(\theta) =  -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}
+\sum_{i=1}^{n}(x_i - \mu)^2
+$$
+
+Maximizing the likelihood is therefore equivalent to minimizing the Negative Log-Likelihood (NLL).
+In the case of a homoscedastic optimization, this reduces to minimizing the squared error, leading to the following loss function:
+
+ $$
+ L = \sum_{i=1}^{n}(\hat{C_d} - C_d)^2
+ $$
 
 
 
