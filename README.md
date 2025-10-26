@@ -9,7 +9,7 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Repository Structure](#-repository-structure)
-- [Results](#-results)
+- [Work presentation](#-work presentation)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
@@ -111,7 +111,7 @@ GenNet/
 ```
 
 
-## 📊 Results
+## 📊 Work presentation
 GenNet achieves accurate prediction of aerodynamic drag coefficients and high-fidelity reconstruction of 3D geometries on the **DrivAerNet++** dataset.
 
 ### Data representation
@@ -291,6 +291,22 @@ where each weighting coefficient $\lambda$ controls the contribution of the corr
 <p align="center">
   SDF gradient norm convergence on 250 epochs
 </p>
+The weight update was performed using Stochastic Gradient Descent (SGD) with a batch size of B = 8 over 250 epochs.
+The optimizer used was Adam, and a learning rate scheduler was also employed to adapt the learning rate dynamically throughout the training process. 
+
+### Results 
+
+GenNet achieved excellent performance both in the prediction of the drag coefficient and in the reconstruction of the Signed Distance Function (SDF)
+
+<p align="center">
+  <img src="docs/grad_norm_page-0001.jpg" width="45%">
+</p>
+
+<p align="center">
+  SDF gradient norm convergence on 250 epochs
+</p>
+
+
 
 
 
