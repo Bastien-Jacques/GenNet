@@ -9,7 +9,7 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Repository Structure](#-repository-structure)
-- [Work presentation](#-work presentation)
+- [Work presentation](#-work-presentation)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
@@ -296,17 +296,48 @@ The optimizer used was Adam, and a learning rate scheduler was also employed to 
 
 ### Results 
 
-GenNet achieved excellent performance both in the prediction of the drag coefficient and in the reconstruction of the Signed Distance Function (SDF)
+GenNet achieved excellent performance both in the prediction of the drag coefficient and in the reconstruction of the Signed Distance Function (SDF). We evaluated the drag coefficient prediction performance using several metrics: the Mean Squared Error (MSE), Mean Absolute Error (MAE), Maximum Absolute Error (MaxAE), and the coefficient of determination R² where:
+
+$$
+R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
+$$
+
+We also computed the Mean Relative Absolute Error (MRAE) on the test set, as well as the Pearson correlation coefficient to assess the linear relationship between predicted and true drag coefficients.
 
 <p align="center">
-  <img src="docs/grad_norm_page-0001.jpg" width="45%">
+  <img src="docs/tableau_Cd.png" width="70%">
 </p>
 
 <p align="center">
-  SDF gradient norm convergence on 250 epochs
+  Performances comparison concernig the prediction of the drag coefficient $C_d$ for several models. 
 </p>
 
+<p align="center">
+  <img src="docs/RMAE_barre_plot (1)_page-0001.jpg" width="45%">
+  <img src="docs/Cd_pred_vs_true_test5_page-0001.jpg" width="45%">
+</p>
 
+<p align="center">
+  <b>Left:</b> Barre plot of the Relative Mean Absolute Error (RMAE) between predictions ($\hat{C_d}$) and ground truth ($C_d)$.  <b>Right:</b> Pearson correlation between predictions ($\hat{C_d}$) and ground truth ($C_d)$ .
+</p>
+
+The SDF reconstruction performance was evaluated using the Chamfer Distance, defined as:
+
+$$
+d_{\text{Chamfer}}(S_1, S_2) =\frac{1}{|S_1|} \sum_{x \in S_1} \min_{y \in S_2} \|x - y\|_2^2 + \frac{1}{|S_2|} \sum_{y \in S_2} \min_{x \in S_1} \|x - y\|_2^2
+$$
+
+where $S_1$ and $S_2$ represent the sets of points from the predicted and ground truth surfaces, respectively.
+
+<p align="center">
+  <img src="docs/tableau_SDF.png" width="70%">
+</p>
+
+<p align="center">
+  Performances comparison concernig the SDF reconstruction for several models. 
+</p>
+
+  
 
 
 
