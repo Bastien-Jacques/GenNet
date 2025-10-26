@@ -134,13 +134,23 @@ To avoid excessive computational cost while maintaining a faithful representatio
 The remaining 20% of the points were sampled randomly within the cube.
 
 <p align="center">
-  <img src="docs/échantillonnage-SDF_250k_pts.JPG" alt="250k sampling points" width="500">
+  <img src="docs/échantillonnage-SDF_250k_pts.JPG" width="55%">
+  <img src="docs/SDF_250k_epsilon.jpg" width="30%">
 </p>
-The red points correspond to locations outside the mesh (SDF > 0), while the blue points are inside the mesh (SDF < 0).
+
 <p align="center">
-  <img src="docs/SDF_250k_epsilon.jpg" alt="Distribution of sampling points as a function of the distance to the mesh" width="300">
+  <b>Left:</b> The red points correspond to locations outside the mesh (SDF > 0), while the blue points are inside the mesh (SDF < 0).  <b>Right:</b> Distribution of sampling points as a function of the distance to the mesh
 </p>
-The geometry of a vehicle is thus fully represented implicitly through the 0-isosurface of the Signed Distance Function.
+
+The geometry of a vehicle is thus fully represented implicitly through the 0-isosurface of the Signed Distance Function. The conversion from meshes to SDF enables an accurate representation of vehicle geometries, as well as the use of fully connected networks and inverse shape generation.
+
+The drag coefficients were normalized using the Min–Max scaling method, with the minimum and maximum values computed only on the training set to prevent any data leakage between the different subsets.
+This normalization helps stabilize the training process by ensuring proper gradient propagation.
+
+### Model 
+
+
+
 
 
 
