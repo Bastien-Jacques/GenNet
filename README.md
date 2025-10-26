@@ -149,7 +149,36 @@ This normalization helps stabilize the training process by ensuring proper gradi
 
 ### Model 
 
+Two different models were created — one with skip connections in the SDF decoder and one without.
+The encoder maps the geometry of each vehicle into a latent vector z of dimension 128.
+The physical decoder predicts the drag coefficient (C<sub>d</sub>) from this latent vector, while the SDF decoder reconstructs the Signed Distance Function, assigning an SDF value to any point in [-1, 1]³ for a given latent vector.
+The architecture of the dual-head autoencoder is shown below.
 
+<p align="center">
+  <img src="docs/autoencodeur.png" width="70%">
+</p>
+
+<p align="center">
+Autoencoder Structure
+</p>
+
+Two different model architectures were considered.
+One model includes skip connections in its SDF decoder, while the other does not.
+The encoder consists of three MLP layers with hidden dimensions of 256.
+The physical decoder is composed of either one or three MLP layers (the GenNet_skip_v2 model includes three layers).
+Finally, the SDF decoder is made up of six layers, each with hidden dimensions of 256.
+
+<p align="center">
+  <img src="docs/decodeur_SDF.JPG" width="45%">
+  <img src="docs/decodeur_SDF_skip.JPG" width="45%">
+</p>
+
+<p align="center">
+  <b>Left:</b> Geometric decoder without skip-connections  <b>Right:</b> Geometric decoder with skip-connections
+</p>
+
+Skip connections make it possible to transmit information from the latent vector during the forward pass and help mitigate the vanishing gradient problem during backpropagation — an issue that can occur when training deep neural networks.
+The tests conducted in this work demonstrated the importance of skip connections, as the model equipped with them achieved significantly better performance compared to the model without skip connections.
 
 
 
