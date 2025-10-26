@@ -276,12 +276,12 @@ $$
 where each weighting coefficient $\lambda$ controls the contribution of the corresponding loss term.
 
 <p align="center">
-  <img src="docs/loss_Cd (1)." width="45%">
-  <img src="docs/decodeur_SDF_skip.JPG" width="45%">
+  <img src="docs/loss_Cd (1)_page-0001.jpg" width="45%">
+  <img src="docs/loss_sdf (1)_page-0001.jpg" width="45%">
 </p>
 
 <p align="center">
-  <b>Left:</b> Geometric decoder without skip-connections  <b>Right:</b> Geometric decoder with skip-connections
+  <b>Left:</b> $C_d$ Loss for 250 epochs for two different models with skip connections (S1 = GenNet_skip, S1' = GenNet_skip_v2)  <b>Right:</b> SDF loss for two different models
 </p>
 
 
