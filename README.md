@@ -363,7 +363,7 @@ The generated shapes exhibit high quality and smooth transitions, demonstrating 
 Morphing between fastback and estateback shapes.
 </p>
 
-### Uncertainty prediction
+### 🧮 Uncertainty prediction
 
 To assess the reliability of the model’s predictions, we implemented an uncertainty estimation method for the drag coefficient predictions.
 This uncertainty helps distinguish between high-confidence regions and areas where the model is less certain.
@@ -375,12 +375,65 @@ In our case, a dropout rate of $p = 0.05$ was applied only to the layers of the 
 This means that each neuron has a probability $p = 0.05$ of being dropped (i.e., temporarily deactivated) both during training and inference, thereby introducing stochasticity in the output and allowing uncertainty estimation.
 
 <p align="center">
-  <img src="docs/interpolation latent.JPG" width="60%">
+  <img src="docs/MC_dropout.JPG" width="60%">
 </p>
 
 <p align="center">
-Morphing between fastback and estateback shapes.
+Illustation of MC dropout
 </p>
+
+Epistemic uncertainty on a prediction \( i \) is determined by the empirical standard deviation:
+
+$$
+\hat{\sigma}_i = \sqrt{\frac{1}{N}\sum_{j=1}^{N}\left(\hat{C}_{d,j}^{(i)} - \hat{\mu}_i\right)^2}
+$$
+
+with respect to the mean:
+
+$$
+\hat{\mu}_i = \frac{1}{N}\sum_{j=1}^{N} \hat{C}_{d,j}^{(i)}
+$$
+
+over the different predictions made by **MC Dropout**.
+
+MC Dropout requires calibration in order to provide uncertainty estimates that can be interpreted as confidence intervals.
+To achieve this, we perform a calibration of the form $\sigma_{\text{cal}} = \alpha\sigma$
+The optimal value of $\alpha$ is determined by minimizing the Gaussian negative log-likelihood (NLL) on the validation set.
+Thus, we have:
+
+$$
+NLL(\alpha) = \frac{1}{2} \sum_{i=1}^{N} 
+\left[
+\log\left( 2\pi \alpha \sigma^{(i)} \right)
++ 
+\left( 
+\frac{ C_d^{(i)} - \mu(\mathbf{x})^{(i)} }{ \alpha \, \sigma^{(i)} }
+\right)^2
+\right]
+$$
+
+By solving $\frac{\partial NLL(\alpha)}{\partial \alpha} = 0$, we obtain:
+
+$$
+\alpha^{*} = 
+\sqrt{
+\frac{1}{N} 
+\sum_{i=1}^{N}
+\left(
+\frac{ C_d^{(i)} - \mu_i }{ \sigma^{(i)} }
+\right)^2
+}
+$$
+
+<p align="center">
+  <img src="docs/coverage_page-0001.jpg" width="60%">
+</p>
+
+<p align="center">
+Empirical coverage measured on the test set after dropout calibration, compared with a Normal distribution.
+</p>
+
+
 
 ### Optimisation in latent space.
 
@@ -389,6 +442,27 @@ The first consists in injecting white noise into the latent vectors correspondin
 However, injecting uniform white noise across all latent components leads to poor results, since each component exhibits different variance within the dataset’s latent space.
 Therefore, we inject noise with variance proportional to that of each component, as estimated by Principal Component Analysis (PCA).
 
+The white-noise search was performed by generating one million latent vectors such that:
+
+$$
+\mathbf{z}_{\text{gen}} = \mathbf{z}_{\text{train}} + \boldsymbol{\epsilon}
+$$
+
+where:
+
+$$
+\epsilon_i \sim \mathcal{N}(0, a^2\mathbb{V}(z_i)),
+$$
+
+$i$ denotes the $i^{\text{th}}$ component of the vector, and $V(z_i)$ is the variance associated with the $i^{\text{th}}$ component of the latent training space (measured using PCA).
+
+<p align="center">
+  <img src="docs/coverage_page-0001.jpg" width="60%">
+</p>
+
+<p align="center">
+Empirical coverage measured on the test set after dropout calibration, compared with a Normal distribution.
+</p>
 
 
 
