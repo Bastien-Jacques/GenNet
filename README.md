@@ -519,7 +519,7 @@ Unfortunately, this method has not yielded conclusive results so far.
 
 ### Conclusion 
 
-This work is part of a broader project on 3D shape generation and aerodynamic optimization, combining geometric learning (via SDF) and physical property prediction (drag coefficient $$C_d).The goal was to develop a model capable of encoding a 3D shape into a latent vector and optimizing this vector according to physical criteria while accounting for predictive uncertainty.
+This work is part of a broader project on 3D shape generation and aerodynamic optimization, combining geometric learning (via SDF) and physical property prediction (drag coefficient $C_d$).The goal was to develop a model capable of encoding a 3D shape into a latent vector and optimizing this vector according to physical criteria while accounting for predictive uncertainty.
 
 A dual-head autoencoder was trained on the DrivAerNet++ dataset to jointly predict the Signed Distance Function (SDF) and the corresponding drag coefficient.A constrained latent-space optimization procedure was then implemented to minimize $C_d$, leveraging MC Dropout to capture epistemic uncertainty and a Mahalanobis distance regularization to remain close to the known shape manifold.
 
@@ -527,6 +527,23 @@ The results show that the model can generate physically plausible and detailed c
 
 Although the dataset size (≈8000 samples) and the dependence on CFD-generated data limit generalization, the method demonstrates strong potential for data-driven aerodynamic shape optimization.
 
+## 🤝 Contributing
+
+This repository was created for research purposes at **ENS Paris-Saclay**. External contributions are not required, but comments and discussions are always welcome.
+
+## 📜 License
+
+This project is licensed under the [MIT License](./LICENSE).  
+You are free to use, modify, and distribute this work, provided that proper credit is given to the author.
+
+## 📬 Contact
+
+**Bastien Jacques**  
+Master student in Mechanical Engineering at École Normale Supérieure Paris-Saclay  
+Master student in Applied mathematics at Université Versailles Saint-Quentin (UVSQ)
+
+📧 bastien.jacques@ens-paris-saclay.fr  
+🔗 [LinkedIn](https://www.linkedin.com/in/bastien-jacques) • [GitHub](https://github.com/Bastien-Jacques)
 
 
 
