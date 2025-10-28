@@ -2,9 +2,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
-[![Report](https://img.shields.io/badge/Report-PDF-red)](./Mémoire.pdf)
+[![Report](https://img.shields.io/badge/Report-PDF-red)](./Memoire.pdf)
 
-GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the DrivAerNet++ [![arXiv](https://img.shields.io/badge/arXiv-2406.09624-b31b1b)](https://arxiv.org/abs/2406.09624) Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Mémoire.pdf), where all details concerning the mechanics part and the data processing are given.
+GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the DrivAerNet++ [![arXiv](https://img.shields.io/badge/arXiv-2406.09624-b31b1b)](https://arxiv.org/abs/2406.09624) Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Memoire.pdf), where all details concerning the mechanics part and the data processing are given.
 
 > **TL;DR:**  
 > GenNet is a dual-head autoencoder that learns both geometry (via Signed Distance Functions) and aerodynamic properties (drag coefficient $C_d$) from the DrivAerNet++ dataset.  
@@ -12,16 +12,16 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 
 
 ## 📋 Table of Contents
-- [Key Features](#Key-Features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Repository Structure](#repository-structure)
-- [Work presentation](#work-presentation)
-- [Future Work](#future-work)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-- [Citation](#citation)
+- [Key Features](#-key-features)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Repository Structure](#-repository-structure)
+- [Work presentation](#-work-presentation)
+- [Future Work](#-future-work)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
+- [Citation](#-citation)
 
 
 ---
@@ -62,8 +62,8 @@ pip install -r requirements.txt
 
 ### 🧠 Train the Model
 To train GenNet on the DrivAerNet++ dataset using the provided configuration file:
-```python
-Training/Train.py --config config.yaml
+```bash
+python Training/Train.py --config config.yaml
 ```
 This will start the training process and save model checkpoints in the checkpoints/ directory.
 
@@ -124,7 +124,7 @@ GenNet/
 ├── config.yaml             # Configuration file for training
 ├── requirements.txt        # Python dependencies
 ├── cd_stats.json           # Dataset statistics
-├── Mémoire.pdf             # Full research report
+├── Memoire.pdf             # Full research report
 ├── LICENSE                 # MIT license
 └── README.md               # Project documentation
 ```
