@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![Report](https://img.shields.io/badge/Report-PDF-red)](./Mémoire.pdf)
 
-GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the [DrivAerNet++](https://arxiv.org/pdf/2406.09624) Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Mémoire.pdf), where all details concerning the mechanics part and the data processing are given.
+GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the DrivAerNet++ [![arXiv](https://img.shields.io/badge/arXiv-2406.09624-b31b1b)](https://arxiv.org/abs/2406.09624) Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Mémoire.pdf), where all details concerning the mechanics part and the data processing are given.
 
 > **TL;DR:**  
 > GenNet is a dual-head autoencoder that learns both geometry (via Signed Distance Functions) and aerodynamic properties (drag coefficient $C_d$) from the DrivAerNet++ dataset.  
@@ -12,14 +12,17 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 
 
 ## 📋 Table of Contents
-- [Key Features](#-key-features)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Repository Structure](#-repository-structure)
-- [Work presentation](#-work-presentation)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Contact](#-contact)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Repository Structure](#repository-structure)
+- [Work presentation](#work-presentation)
+- [Future Work](#future-work)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+- [Citation](#citation)
+
 
 ---
 
@@ -43,7 +46,7 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 git clone https://github.com/Bastien-Jacques/GenNet.git
 cd GenNet
 ```
-### Create a virtual environement
+### Create a virtual environment
 ```bash
 python -m venv venv
 # Linux/Mac
@@ -60,7 +63,7 @@ pip install -r requirements.txt
 ### 🧠 Train the Model
 To train GenNet on the DrivAerNet++ dataset using the provided configuration file:
 ```python
-train.py --config config.yaml
+Training/Train.py --config config.yaml
 ```
 This will start the training process and save model checkpoints in the checkpoints/ directory.
 
@@ -110,7 +113,7 @@ GenNet/
 ├── Notebooks/              # Jupyter notebooks for analysis of the results
 │   └── Analyse.ipynb
 │   
-├── Training/               # Training with or wothout Eikonal Loss 
+├── Training/               # Training with or without Eikonal Loss 
 │   ├── Train.py
 │   └── Train_Eikonal.py
 │
@@ -325,7 +328,7 @@ We also computed the Mean Relative Absolute Error (MRAE) on the test set, as wel
 </p>
 
 <p align="center">
-  Performances comparison concernig the prediction of the drag coefficient $C_d$ for several models. 
+  Performances comparison concerning the prediction of the drag coefficient $C_d$ for several models. 
 </p>
 
 <p align="center">
@@ -334,7 +337,7 @@ We also computed the Mean Relative Absolute Error (MRAE) on the test set, as wel
 </p>
 
 <p align="center">
-  <b>Left:</b> Barre plot of the Relative Mean Absolute Error (RMAE) between predictions ($\hat{C_d}$) and ground truth ($C_d)$.  <b>Right:</b> Pearson correlation between predictions ($\hat{C_d}$) and ground truth ($C_d)$ .
+  <b>Left:</b> Bar plot of the Relative Mean Absolute Error (RMAE) between predictions ($\hat{C_d}$) and ground truth ($C_d$).  <b>Right:</b> Pearson correlation between predictions ($\hat{C_d}$) and ground truth ($C_d$) .
 </p>
 
 The SDF reconstruction performance was evaluated using the Chamfer Distance (CD), defined as:
@@ -351,7 +354,7 @@ where $S_1$ and $S_2$ represent the sets of points from the predicted and ground
 
 
 <p align="center">
-  <b>Up:</b> Performances comparison concernig the SDF reconstruction for several models.  <b>Right:</b> Chamfer distance for the test set. Comparison between the differents car shapes in the dataset (Notchback, Fastback, Estateback).
+  <b>Up:</b> Performances comparison concernig the SDF reconstruction for several models.  <b>Right:</b> Chamfer distance for the test set. Comparison between the different car shapes in the dataset (Notchback, Fastback, Estateback).
 </p>
 
 <p align="center">
@@ -395,7 +398,7 @@ This means that each neuron has a probability $p = 0.05$ of being dropped (i.e.,
 </p>
 
 <p align="center">
-Illustation of MC dropout
+Illustration of MC dropout
 </p>
 
 Epistemic uncertainty on a prediction \( i \) is determined by the empirical standard deviation:
@@ -472,7 +475,7 @@ $$
 
 $i$ denotes the $i^{\text{th}}$ component of the vector, and $V(z_i)$ is the variance associated with the $i^{\text{th}}$ component of the latent training space (measured using PCA).
 
-This method allowed us to obtain promising results.Among the one million new latent vectors generated in this way, three produced geometries whose drag coefficients, as estimated by our model, are lower than that of the best geometry in the database in terms of drag performance. A verification using CFD under the same conditions as the DrivAerNet++ dataset remains to be carried out to confirm these results.
+This method allowed us to obtain promising results. Among the one million new latent vectors generated in this way, three produced geometries whose drag coefficients, as estimated by our model, are lower than that of the best geometry in the database in terms of drag performance. A verification using CFD under the same conditions as the DrivAerNet++ dataset remains to be carried out to confirm these results.
 
 <p align="center">
   <img src="docs/nouveaux_vecteurs_latents_page-0001 (1).jpg" width="35%">
@@ -519,13 +522,20 @@ Unfortunately, this method has not yielded conclusive results so far.
 
 ### Conclusion 
 
-This work is part of a broader project on 3D shape generation and aerodynamic optimization, combining geometric learning (via SDF) and physical property prediction (drag coefficient $C_d$).The goal was to develop a model capable of encoding a 3D shape into a latent vector and optimizing this vector according to physical criteria while accounting for predictive uncertainty.
+This work is part of a broader project on 3D shape generation and aerodynamic optimization, combining geometric learning (via SDF) and physical property prediction (drag coefficient $C_d$). The goal was to develop a model capable of encoding a 3D shape into a latent vector and optimizing this vector according to physical criteria while accounting for predictive uncertainty.
 
 A dual-head autoencoder was trained on the DrivAerNet++ dataset to jointly predict the Signed Distance Function (SDF) and the corresponding drag coefficient.A constrained latent-space optimization procedure was then implemented to minimize $C_d$, leveraging MC Dropout to capture epistemic uncertainty and a Mahalanobis distance regularization to remain close to the known shape manifold.
 
 The results show that the model can generate physically plausible and detailed car geometries, while accurately predicting their drag coefficients.
 
 Although the dataset size (≈8000 samples) and the dependence on CFD-generated data limit generalization, the method demonstrates strong potential for data-driven aerodynamic shape optimization.
+
+## 🔭 Future Work
+- Extend dataset and CFD fidelity
+- Fourier Features for high-frequency SDF
+- Heteroscedastic / adaptive-weight losses
+- Bayesian/ensemble UQ beyond MC Dropout
+
 
 ## 🤝 Contributing
 
@@ -544,6 +554,17 @@ Master student in Applied mathematics at Université Versailles Saint-Quentin (U
 
 📧 bastien.jacques@ens-paris-saclay.fr  
 🔗 [LinkedIn](https://www.linkedin.com/in/bastien-jacques-152b4430a/) • [GitHub](https://github.com/Bastien-Jacques)
+
+## 📚 Citation
+```bibtex
+@mastersthesis{Jacques2025GenNet,
+  title   = {GenNet: Deep Learning Framework for 3D Car Shape Generation and Aerodynamic Optimization},
+  author  = {Bastien Jacques},
+  school  = {École Normale Supérieure Paris-Saclay},
+  year    = {2025},
+  note    = {Master Thesis}
+}
+
 
 
 
