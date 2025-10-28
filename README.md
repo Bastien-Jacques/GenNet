@@ -543,7 +543,7 @@ Master student in Mechanical Engineering at École Normale Supérieure Paris-Sac
 Master student in Applied mathematics at Université Versailles Saint-Quentin (UVSQ)
 
 📧 bastien.jacques@ens-paris-saclay.fr  
-🔗 [LinkedIn](https://www.linkedin.com/in/bastien-jacques) • [GitHub](https://github.com/Bastien-Jacques)
+🔗 [LinkedIn](https://www.linkedin.com/in/bastien-jacques-152b4430a/) • [GitHub](https://github.com/Bastien-Jacques)
 
 
 
