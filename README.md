@@ -3,8 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![Report](https://img.shields.io/badge/Report-PDF-red)](./Memoire.pdf)
+[![arXiv](https://img.shields.io/badge/arXiv-2406.09624-b31b1b)](https://arxiv.org/abs/2406.09624)
 
-GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the DrivAerNet++ [![arXiv](https://img.shields.io/badge/arXiv-2406.09624-b31b1b)](https://arxiv.org/abs/2406.09624) Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Memoire.pdf) (French), where all details concerning the mechanics part and the data processing are given.
+GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the [DrivAerNet++](https://arxiv.org/abs/2406.09624) Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Memoire.pdf) (French), where all details concerning the mechanics part and the data processing are given.
 
 > **TL;DR:**  
 > GenNet is a dual-head autoencoder that learns both geometry (via Signed Distance Functions) and aerodynamic properties (drag coefficient $C_d$) from the DrivAerNet++ dataset.  
@@ -81,8 +82,8 @@ The `Inference/` folder contains several scripts for evaluating and post-process
 | `Uncertainty.py` | Estimates model uncertainty on drag prediction using Monte Carlo Dropout. |
 
 Each script can be executed independently:
-```python
-Inference/Drag_prediction.py --weights checkpoints/best_model.pt --input data
+```bash
+python Inference/Drag_prediction.py --weights checkpoints/best_model.pt --input data
 ```
 by replacing [Drag_prediction] by the wanted code from the Inference folder.
 
@@ -230,14 +231,14 @@ $$
 \mathcal{L}(\theta)
 = \prod_{i=1}^{n}
 \frac{1}{\sqrt{2\pi\sigma^2}}
-\exp\left(-\frac{(x_i - \mu)^2}{2\sigma^2}\right)
+\exp\left(-\frac{(y_i - \mu)^2}{2\sigma^2}\right)
 $$
 
 which give the negative log likelihood:
 
 $$
 NLL(\theta) =  \frac{n}{2}\log(2\pi\sigma^2) + \frac{1}{2\sigma^2}
-\sum_{i=1}^{n}(x_i - \mu)^2
+\sum_{i=1}^{n}(y_i - \mu)^2
 $$
 
 Maximizing the likelihood is therefore equivalent to minimizing the Negative Log-Likelihood (NLL).
@@ -281,7 +282,7 @@ $$
 
 This loss can be used by running the training script
 ```bash
-Training/Train_Eikonal.py.
+python Training/Train_Eikonal.py
 ```
 
 For computational efficiency, the SDF gradient is not computed on all 250k sampled points, but only on 25k randomly selected points at each iteration.
@@ -362,7 +363,7 @@ where $S_1$ and $S_2$ represent the sets of points from the predicted and ground
 </p>
 
 <p align="center">
-<b>Down:</b> Chamfer distance for the test set. Comparison between the differents car shapes in the dataset (Notchback, Fastback, Estateback).
+<b>Down:</b> Chamfer distance for the test set. Comparison between the different car shapes in the dataset (Notchback, Fastback, Estateback).
 </p>
 
 As expected, our model is less performant than models dedicated exclusively to geometric reconstruction. Nevertheless, GenNet enables the faithful reconstruction of shapes that were never seen during training.
@@ -564,7 +565,7 @@ Master student in Applied mathematics at Université Versailles Saint-Quentin (U
   year    = {2025},
   note    = {Master Thesis}
 }
-
+```
 
 
 
