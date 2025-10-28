@@ -533,7 +533,7 @@ This repository was created for research purposes at **ENS Paris-Saclay**. Exter
 
 ## 📜 License
 
-This project is licensed under the [MIT License](./LICENSE).  
+This project is licensed under the [MIT License](LICENSE).  
 You are free to use, modify, and distribute this work, provided that proper credit is given to the author.
 
 ## 📬 Contact
