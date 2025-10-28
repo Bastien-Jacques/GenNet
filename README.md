@@ -2,10 +2,17 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
+[![Report](https://img.shields.io/badge/Report-PDF-red)](./Mémoire.pdf)
 
 GenNet is a deep learning framework for predicting the aerodynamic drag coefficient of vehicle shapes and reconstructing their Signed Distance Functions (SDF). This enables the generation of new car geometries optimized for aerodynamic performance. GenNet is based on an autoencoder structure. The model has been trained on the [DrivAerNet++](https://arxiv.org/pdf/2406.09624) Dataset (train set). This repository contains the source code, analysis notebooks, and scripts to train and evaluate the model. You can also read the full work by [clicking on the link](./Mémoire.pdf), where all details concerning the mechanics part and the data processing are given.
 
+> **TL;DR:**  
+> GenNet is a dual-head autoencoder that learns both geometry (via Signed Distance Functions) and aerodynamic properties (drag coefficient $C_d$) from the DrivAerNet++ dataset.  
+> It enables **3D car shape generation** and **latent-space optimization** with uncertainty estimation through MC Dropout.
+
+
 ## 📋 Table of Contents
+- [Key Features](#-key-features)
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Repository Structure](#-repository-structure)
@@ -15,6 +22,15 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 - [Contact](#-contact)
 
 ---
+
+## 🧠 Key Features
+
+- 🌀 **Dual-head autoencoder** for simultaneous geometry and drag prediction  
+- 🧱 **SDF-based shape representation** allowing implicit 3D modeling  
+- 🎯 **Latent-space optimization** for aerodynamic improvement  
+- 🔎 **Epistemic uncertainty estimation** using MC Dropout  
+- 🧮 **Mahalanobis regularization** to stay within the learned manifold  
+- 🚗 **3D car geometry generation** and morphing between designs  
 
 ## 🛠 Installation
 
