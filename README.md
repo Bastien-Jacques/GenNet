@@ -12,7 +12,7 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 
 
 ## 📋 Table of Contents
-- [Key Features](#key-features)
+- [Key Features](#Key-Features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Repository Structure](#repository-structure)
