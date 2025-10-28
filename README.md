@@ -85,7 +85,7 @@ Each script can be executed independently:
 ```bash
 python Inference/Drag_prediction.py --weights checkpoints/best_model.pt --input data
 ```
-by replacing [Drag_prediction] by the wanted code from the Inference folder.
+by replacing [Drag_prediction] with the desired script from the Inference folder.
 
 
 ## 📁 Repository Structure
@@ -154,7 +154,7 @@ To avoid excessive computational cost while maintaining a faithful representatio
 The remaining 20% of the points were sampled randomly within the cube.
 
 <p align="center">
-  <img src="docs/échantillonnage-SDF_250k_pts.JPG" width="55%">
+  <img src="docs/echantillonnage-SDF_250k_pts.JPG" width="55%">
   <img src="docs/SDF_250k_epsilon.jpg" width="30%">
 </p>
 
@@ -525,7 +525,7 @@ Unfortunately, this method has not yielded conclusive results so far.
 
 This work is part of a broader project on 3D shape generation and aerodynamic optimization, combining geometric learning (via SDF) and physical property prediction (drag coefficient $C_d$). The goal was to develop a model capable of encoding a 3D shape into a latent vector and optimizing this vector according to physical criteria while accounting for predictive uncertainty.
 
-A dual-head autoencoder was trained on the DrivAerNet++ dataset to jointly predict the Signed Distance Function (SDF) and the corresponding drag coefficient.A constrained latent-space optimization procedure was then implemented to minimize $C_d$, leveraging MC Dropout to capture epistemic uncertainty and a Mahalanobis distance regularization to remain close to the known shape manifold.
+A dual-head autoencoder was trained on the DrivAerNet++ dataset to jointly predict the Signed Distance Function (SDF) and the corresponding drag coefficient. A constrained latent-space optimization procedure was then implemented to minimize $C_d$, leveraging MC Dropout to capture epistemic uncertainty and a Mahalanobis distance regularization to remain close to the known shape manifold.
 
 The results show that the model can generate physically plausible and detailed car geometries, while accurately predicting their drag coefficients.
 
