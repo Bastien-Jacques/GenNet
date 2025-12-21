@@ -29,12 +29,12 @@ GenNet is a deep learning framework for predicting the aerodynamic drag coeffici
 
 ## 🧠 Key Features
 
-- 🌀 **Dual-head autoencoder** for simultaneous geometry and drag prediction  
-- 🧱 **SDF-based shape representation** allowing implicit 3D modeling  
-- 🎯 **Latent-space optimization** for aerodynamic improvement  
-- 🔎 **Epistemic uncertainty estimation** using MC Dropout  
-- 🧮 **Mahalanobis regularization** to stay within the learned manifold  
-- 🚗 **3D car geometry generation** and morphing between designs  
+- **Dual-head autoencoder** for simultaneous geometry and drag prediction  
+- **SDF-based shape representation** allowing implicit 3D modeling  
+- **Latent-space optimization** for aerodynamic improvement  
+- **Epistemic uncertainty estimation** using MC Dropout  
+- **Mahalanobis regularization** to stay within the learned manifold  
+- **3D car geometry generation** and morphing between designs  
 
 ## 🛠 Installation
 
