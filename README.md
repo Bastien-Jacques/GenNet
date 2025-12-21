@@ -551,7 +551,7 @@ You are free to use, modify, and distribute this work, provided that proper cred
 
 **Bastien Jacques**  
 Master student in Mechanical Engineering at École Normale Supérieure Paris-Saclay  
-Master student in Applied mathematics at Université Versailles Saint-Quentin (UVSQ)
+Master student in Applied mathematics at Université Paris-Saclay
 
 📧 bastien.jacques@ens-paris-saclay.fr  
 🔗 [LinkedIn](https://www.linkedin.com/in/bastien-jacques-152b4430a/) • [GitHub](https://github.com/Bastien-Jacques)
