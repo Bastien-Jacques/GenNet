@@ -5,7 +5,8 @@ torch>=2.4.1
 torchvision>=0.15
 matplotlib>=3.7
 open3d>=0.17
-tqdm
+tqdm==4.66.4
+wandb==0.17.0
 pandas
 pyyaml
 
