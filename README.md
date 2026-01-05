@@ -493,7 +493,7 @@ To do so, we start by initializing the search with a starting vector \( z_0 \), 
 We then perform the descent according to the update rule:
 
 $$
-\mathbf{z} := \mathbf{z} - \eta \, \frac{\partial \mathcal{L}}{\partial \mathbf{z}}
+\mathbf{z} := \mathbf{z} - \eta \. \frac{\partial \mathcal{L}}{\partial \mathbf{z}}
 $$
 
 where $\eta$ is the learning rate.  
